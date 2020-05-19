@@ -17,29 +17,13 @@ a, a:hover, a:visited{
     text-decoration: none;
 }
 
-.wrapper{
-    max-width: 960px;
-    margin: 0 auto;
-    /* text-align: center; */
-}
-
-.wrapper p {
-    text-align: center;
-}
-
-div.wrapper > h1{
-    text-align: center;
-    margin: 30px auto;
-    font-size: 2.4em
-}
 
 .site-form {
     /* display: inline-block; */
-    margin: auto;
+    /* margin: auto; */
     border: 1px solid #6c757d;
     padding: 20px;
     box-shadow: 0px 0px 10px 0px black;
-    max-width: 500px;
 }
 
 .site-form input, .site-form textarea{
@@ -81,4 +65,13 @@ a.highlight{
     font-size: 20px;
     border-radius: 4px;
     margin: 10px 0;
+}
+
+
+.menu-subheading
+{
+    background-color: lightgray; 
+    margin: 0; 
+    padding: .3em; 
+    text-align: center;    
 }

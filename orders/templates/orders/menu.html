@@ -1,15 +1,271 @@
 {% extends 'base_layout.html' %}
 
+{% block title %}{{ block.super }} - Menu{% endblock %}
+
+{% block head %}
+{% load static %}
+<script src="{% static 'orders/menu.js' %}"></script>
+{% endblock %}
+
 {% block content%}
-    <h1>Articles List</h1>
-    <div class="articles">
-    {% for article in articles %}
-        <div class="article">
-            <h2><a href="{% url 'articles:detail' slug=article.slug %}">{{ article.title }}</a></h2>
-            <p>{{ article.snippet }}</p>
-            <p>{{ article.date }}</p>
-            <p class="author">added by {{ article.author.username }}</p>
-        </div>
-    {% endfor %}
-    </div>
+<h1 class="text-center">Menu</h1>
+<nav class="navbar sticky-top navbar-dark bg-dark">
+    {% if regular_pizzas %}
+    <a class="navbar-brand" href="#regular_pizzas">Regular Pizzas</a>
+    {% endif %}
+
+    {% if sicilian_pizzas %}
+    <a class="navbar-brand" href="#sicilian_pizza">Sicilian Pizzas</a>
+    {% endif %}
+
+    {% if toppings %}
+    <a class="navbar-brand" href="#toppings">Toppings</a>
+    {% endif %}
+
+    {% if subs %}
+    <a class="navbar-brand" href="#subs">Subs</a>
+    {% endif %}
+
+    {% if pastas %}
+    <a class="navbar-brand" href="#pastas">Pastas</a>
+    {% endif %}
+
+    {% if salads %}
+    <a class="navbar-brand" href="#salads">Salads</a>
+    {% endif %}
+
+    {% if dinners %}
+    <a class="navbar-brand" href="#dinners">Dinner Platters</a>
+    {% endif %}
+</nav>
+
+<!-- now lets write the menu for each type -->
+
+{% if regular_pizzas %}
+<br>
+<h2 id="regular_pizzas" class="menu-subheading">Regular Pizzas</h2>
+<div>
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th scope="col" style="width: 60%"></th>
+                <th scope="col" style="width: 20%" >Small</th>
+                <th scope="col" style="width: 20%" >Large</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pizza in regular_pizzas %}
+            <tr>
+                <td><b>{{ pizza.name }}</b></td>
+                {% if pizza.id_small %}
+                <td >{{ pizza.price_small }} <a href="{% url 'orders:additem' pizza.id_small %}" >Add to Cart</a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
+
+                {% if pizza.id_large %}
+                <td>{{ pizza.price_large }} <a href="{% url 'orders:additem' pizza.id_large %}">Add to Cart</a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+
+{% if sicilian_pizzas %}
+<br>
+<h2 id="sicilian_pizzas" class="menu-subheading">Sicilian Pizzas</h2>
+<div>
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th scope="col" style="width: 60%"></th>
+                <th scope="col" style="width: 20%" >Small</th>
+                <th scope="col" style="width: 20%" >Large</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pizza in sicilian_pizzas %}
+            <tr>
+                <td><b>{{ pizza.name }}</b></td>
+                {% if pizza.id_small %}
+                <td>{{ pizza.price_small }} <a href="{% url 'orders:additem' pizza.id_small %}">Add to Cart</a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
+
+                {% if pizza.id_large %}
+                <td>{{ pizza.price_large }} <a href="{% url 'orders:additem' pizza.id_large %}">Add to Cart</a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+
+{% if toppings %}
+<br>
+<h2 id="toppings" class="menu-subheading">Toppings</h2>
+<div>
+    <table class="table table-hover table-striped">
+        <tbody>
+            {% for topping in toppings %}
+            <tr style="text-align: center;">
+                <td>{{ topping.name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+
+
+{% if subs %}
+<br>
+<h2 id="subs" class="menu-subheading">Subs</h2>
+<div>
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th scope="col" style="width: 60%"></th>
+                <th scope="col" style="width: 20%" >Small</th>
+                <th scope="col" style="width: 20%" >Large</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sub in subs %}
+            <tr>
+                <td><b>{{ sub.name }}</b></td>
+                {% if sub.id_small %}
+                <td>{{ sub.price_small }} <a href="{% url 'orders:additem' sub.id_small %}">Add to Cart</a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
+
+                {% if sub.id_large %}
+                <td>{{ sub.price_large }} <a href="{% url 'orders:additem' sub.id_large %}">Add to Cart</a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+
+            <!-- now lets add all the extras if present -->
+            {% for extra in extras %}
+            <tr>
+                <td><b>+ {{ extra.name }} on any sub</b></td>
+                {% if extra.id_small %}
+                <td>+{{ extra.price_small }} <a href="{% url 'orders:additem' extra.id_small %}">Add to Cart</a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
+
+                {% if extra.id_large %}
+                <td>+{{ extra.price_large }} <a href="{% url 'orders:additem' extra.id_large %}">Add to Cart</a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+
+{% if pastas %}
+<br>
+<h2 id="pastas" class="menu-subheading">Pasta</h2>
+<div>
+    <table class="table table-hover table-striped">
+        <colgroup>
+            <col width="60%"></col>
+            <col width="20%"></col>
+        </colgroup>
+        <tbody>
+            {% for pasta in pastas %}
+            <tr>
+                <td><b>{{ pasta.name }}</b></td>
+                <td>{{ pasta.price }} <a href="{% url 'orders:additem' pasta.id %}">Add to Cart</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if salads %}
+<br>
+<h2 id="salads" class="menu-subheading">Salad</h2>
+<div>
+    <table class="table table-hover table-striped">
+        <colgroup>
+            <col width="60%"></col>
+            <col width="20%"></col>
+        </colgroup>
+        <tbody>
+            {% for salad in salads %}
+            <tr>
+                <td><b>{{ salad.name }}</b></td>
+                <td>{{ salad.price }} <a href="{% url 'orders:additem' salad.id %}">Add to Cart</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+
+{% if dinners %}
+<br>
+<h2 id="dinners" class="menu-subheading">Dinner Platters</h2>
+<div>
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th scope="col" style="width: 60%"></th>
+                <th scope="col" style="width: 20%" >Small</th>
+                <th scope="col" style="width: 20%" >Large</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dinner in dinners %}
+            <tr>
+                <td><b>{{ dinner.name }}</b></td>
+                {% if dinner.id_small %}
+                <td>{{ dinner.price_small }} <a href="{% url 'orders:additem' dinner.id_small %}">Add to Cart</a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
+
+                {% if dinner.id_large %}
+                <td>{{ dinner.price_large }} <a href="{% url 'orders:additem' dinner.id_large %}">Add to Cart</a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+
+
+
+
+
+</div>
+<button id="movetotop" style="right:1.5em;bottom:2em; display: none;" class="btn btn-dark position-fixed">to top</button>
+
+
 {% endblock %}
