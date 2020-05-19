@@ -15,7 +15,7 @@ class BaseItem(models.Model):
     """Base class for items. This will contain the item basic properties."""
 
     name = models.CharField(max_length=64)
-    description = models.CharField(max_length=64,default="")
+    description = models.CharField(max_length=64, blank=True)
     SMALL = 'Small'
     LARGE = 'Large'
     SIZE_CHOICES = (
@@ -25,55 +25,46 @@ class BaseItem(models.Model):
     size = models.CharField(max_length=8, choices=SIZE_CHOICES, blank=True)
     price = models.DecimalField(max_digits=6, decimal_places=2,blank=True, default=0) # Blankable for Toppings
 
-    class Meta:
-            abstract = True
-
-
     def __str__(self):
-        if  ( {self.price} > 0 ) :
-            return f"{self.name} @ {self.price}"
-        else:
-            return f"{self.name}"
+        retstr = f"{self.name}"
+        if ( self.is_size_required() ):
+            retstr += f" ({self.size})"
+
+        if ( self.is_price_required() ):
+            retstr += f" @{self.price})"
+        return retstr
 
 
 
+    def is_price_required(self):
+        return False
+
+    def is_size_required(self):
+        return False
 
 
-#-----------------------------------------------------------------------
-#
-class BaseItemWithPrice(BaseItem):
-    """Base class for items which requires a price compulsory"""
+    def is_valid_item(self):
+        if ( self.is_price_required() ):
+            if ( self.price <= 0 ):
+                return "Price is not valid"
 
-    # here i am overriding the base class instance to make it that it cannot be left blank and it should have some price.
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+        if ( self.is_size_required() ):
+            if ( "" == self.size ):
+                return "Portion size is not specified"
 
-    class Meta:
-            abstract = True
+        return ""
 
-
-
-
-
-#-----------------------------------------------------------------------
-#
-class BaseItemWithPriceNSize(BaseItemWithPrice):
-    """Base class for items which requires a size compulsory"""
-
-    # here i am overriding the base class instance to make it that it cannot be left blank and it should have some size.
-    size = models.CharField(max_length=8, choices= BaseItem.SIZE_CHOICES, blank=False)
-
-    class Meta:
-            abstract = True
-
-    def __str__(self):
-        return f"{self.name} ({self.size}) @ {self.price}"
-
-
+    def save(self, *args, **kwargs):
+        # Check if we can save with the current settings or not.
+        errmsg = self.is_valid_item()
+        if ( len(errmsg) > 0 ):
+            raise ValueError(errmsg)
+        super().save(*args, **kwargs)
 
 
 #-----------------------------------------------------------------------
 #
-class Pizza(BaseItemWithPriceNSize):
+class Pizza(BaseItem):
     """ Defines a pizza. Pizza can have 2 types of bases."""
 
     REGULAR = 'Regular'
@@ -89,38 +80,59 @@ class Pizza(BaseItemWithPriceNSize):
     def __str__(self):
         return f"{self.crust} Pizza with {self.name} ({self.size}) @ {self.price}"
 
+    def is_price_required(self):
+        return True
+
+    def is_size_required(self):
+        return True
+
 
 
 
 #-----------------------------------------------------------------------
 #
-class Dinner(BaseItemWithPriceNSize):
+class Dinner(BaseItem):
     """ Defines a Dinner here."""
 
     class Meta:
         verbose_name = "Dinner Platter"
         verbose_name_plural = "Dinner Platters"
 
+    def is_price_required(self):
+        return True
+
+    def is_size_required(self):
+        return True
 
 
 
 #-----------------------------------------------------------------------
 #
-class Sub(BaseItemWithPriceNSize):
+class Sub(BaseItem):
     """ Defines a sub here."""
-    pass
+
+    def is_price_required(self):
+        return True
+
+    def is_size_required(self):
+        return True
 
 
 
 
 #-----------------------------------------------------------------------
 #
-class SubExtra(BaseItemWithPriceNSize):
+class SubExtra(BaseItem):
     """Define extra-options."""
 
     def __str__(self):
         return f"{self.name}"
 
+    def is_price_required(self):
+        return True
+
+    def is_size_required(self):
+        return True
 
 
 
@@ -130,18 +142,21 @@ class SubExtra(BaseItemWithPriceNSize):
 class Topping(BaseItem):
     """Define toppings."""
 
-    def __str__(self):
-        return f"{self.name}"
-
+    pass
 
 
 
 
 #-----------------------------------------------------------------------
 #
-class Pasta(BaseItemWithPrice):
+class Pasta(BaseItem):
     """Define pastas."""
-    pass
+
+    def is_price_required(self):
+        return True
+
+    def is_size_required(self):
+        return False
 
 
 
@@ -149,9 +164,14 @@ class Pasta(BaseItemWithPrice):
 
 #-----------------------------------------------------------------------
 #
-class Salad(BaseItemWithPrice):
+class Salad(BaseItem):
     """Define salads."""
-    pass
+
+    def is_price_required(self):
+        return True
+
+    def is_size_required(self):
+        return False
 
 
 
