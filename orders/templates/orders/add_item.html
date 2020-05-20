@@ -1,0 +1,73 @@
+{% extends 'base_layout.html' %}
+
+{% block head %}
+{% load static %}
+<script src="{% static 'orders/add_item.js' %}"></script>
+{% endblock %}
+
+
+{% block title %}{{ block.super }} - add item{% endblock %}
+
+
+{% block content%}
+<form action="{% url 'orders:add_item' item.id %}" method="POST">
+    {% csrf_token %}
+    <nav class="navbar sticky-top navbar-dark bg-dark justify-content-between">
+        <a class="btn btn-sm btn-outline-secondary my-2 my-sm-0" href="{% url 'orders:menu' %}">Back to menu</a>
+        <input type="submit" value="Add to Cart" class="btn btn-sm btn-outline-success my-2 my-sm-0">
+    </nav>
+
+    <h1>{{ item.name }}{% if item.size != '' %} - ({{item.size}}){% endif %}</h1>
+    <!-- Get the individual item price -->
+    <span id="individual-item-price" style="display: none;">{{ item.price }}</span>
+
+    <!-- lets create a table with hidden borders so as to show the options. -->
+    <table class="table table-striped">
+        <colgroup>
+            <col width="60%"></col>
+            <col width="40%"></col>
+        </colgroup>
+        <tbody>
+            <!-- set the quantity form element. -->
+            <tr>
+                <td>Quantity</td>
+                <td><input name="quantity" id="quantity" type="number" value=1 min=1 max=10></td>
+            </tr>
+            
+            <!-- we will get topping opion only if required -->
+            {% if toppings and max_toppings > 0 %}
+                {% with ''|center:max_toppings as range %}
+                    {% for _ in range %}
+                    <tr>
+                        <td>Topping - {{ forloop.counter }}</td>
+                        <td><select name="topping-{{forloop.counter}}">
+                            {% for topping in toppings %}
+                                <option value="{{ topping.id }}">{{ topping.name }}</option>
+                            {% endfor %}</select></td>
+                    </tr>
+                    {% endfor %}
+                {% endwith %}            
+            {% endif%}
+
+            <!-- we will get extra options only if required -->
+            {% if extras %}
+            {% for extra in extras %}
+            <tr>
+                <td>Extra {{ extra.name }} (+<span id="extra_price-{{extra.id}}">{{ extra.price }}</span>)</td>
+                <td><input name="extra" value="{{ extra.id }}" id="extra-{{extra.id}}" type="checkbox"></td>
+            </tr>
+            {% endfor %}
+            {% endif%}
+
+            <!-- Now lets show the total price -->
+            <tr style="font-weight:bold">
+                <td>Total Price</td>
+                <td><div id="total-price">{{ item.price }}</div></td>
+            </tr>
+    
+        </tbody>
+    </table>
+
+
+</form>
+{% endblock %}

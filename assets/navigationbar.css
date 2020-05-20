@@ -9,8 +9,8 @@ top: 0; */
 }
 
 
-.NavigationBar .NavigationBarbutton {
-background: none!important;
+.NavigationBarbutton {
+background: none;
 border: none;
 /* padding: 0!important; */
 /*optional*/
@@ -22,9 +22,10 @@ border: none;
 }
 
 /* Change color on hover */
-.NavigationBar .NavigationBarbutton:hover{
+.NavigationBarbutton:hover {
   background-color: #ddd;
   color: black;
+  text-decoration: underline;
 }
 
 

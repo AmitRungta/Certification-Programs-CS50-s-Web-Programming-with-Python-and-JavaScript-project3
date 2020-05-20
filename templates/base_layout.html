@@ -26,16 +26,21 @@
     <div class="NavigationBar">
         {% block navigationbarbar %}
         {% if user.is_superuser %}
-        <a href="{% url 'orders:manage_admin_order' %}" >Manage Order</a>
+        <a href="{% url 'orders:manage_admin_order' %}">Manage Order</a>
         {% endif %}
         <a href="{% url 'orders:menu' %}" >Menu</a>
-        <a href="{% url 'orders:order' %}" >Order</a>
-        <a href="{% url 'orders:cart' %}" >Cart</a>
+        <a href="{% url 'orders:order_history' %}">Previous Orders</a>
+        <a href="{% url 'orders:cart' %}">Cart
+            {% if item_in_cart_count %}
+            <!-- AmitTempCode add the data for item_in_cart_count -->
+            <span class="badge badge-pill badge-light" style="font-size: 60%; position: absolute;">{{item_in_cart_count}}</span>
+            {% endif %}
+        </a>
 
         {% if user.is_authenticated %}
-            <form class="logout-link" action="{% url 'accounts:logout' %}" method="post">
+            <form class="logout-link " action="{% url 'accounts:logout' %}" method="post">
                 {% csrf_token %}
-                <button class="NavigationBarbutton right" type="submit">Logout</button>
+                <button class="button right NavigationBarbutton" type="submit">Logout</button>
             </form>
         {% else %}
         <a href="{% url 'accounts:login' %}" class="right">Login</a>
@@ -49,6 +54,29 @@
         {% block content %}
         {% endblock %}
     </div>
+
+
+    <button id="movetotop" style="right:1.5em;bottom:2em; display: none;" class="btn btn-dark position-fixed">to top</button>
+
 </body>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        document.querySelector('#movetotop').onclick = () => {
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        };
+
+        window.onscroll = () => {
+            if (document.body.scrollTop > 15 || document.documentElement.scrollTop > 15) {
+                document.getElementById("movetotop").style.display = "block";
+            } else {
+                document.getElementById("movetotop").style.display = "none";
+            };
+        };
+    });
+</script>
 
 </html>

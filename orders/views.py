@@ -1,8 +1,9 @@
 ''' This view is used for showing the different view options '''
-from django.http import HttpResponse , HttpResponseForbidden
-from django.shortcuts import render, redirect
+from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+
 from .models import Pizza, Sub, Dinner, SubExtra, Topping, Salad, Pasta, BaseItem
 
 
@@ -61,11 +62,36 @@ def index(request):
 
 
 @login_required(login_url='accounts:login')
-def additem(request, item_id):
-    ''' FUnction to ask for adding a new item into cart '''
-    # AmitTempCode
-    context = {}
-    return render(request, 'orders/menu.html', context)
+def add_item(request, item_id):
+    ''' Function to ask for adding a new item into cart.
+    This will get post message from the form with updated data '''
+
+    if request.method == 'GET':
+        try:
+            baseitem = BaseItem.objects.get(pk=item_id)
+        except:
+            return HttpResponseRedirect(reverse('menu'))
+
+        context = {
+            "item": baseitem,
+        }
+
+        # check if this is for pizza and it requires custom toppings
+        if hasattr(baseitem, 'pizza') and baseitem.pizza.max_toppings > 0:
+            context['toppings'] = Topping.objects.all()
+            context['max_toppings'] = baseitem.pizza.max_toppings
+        # check if this is for sub and can have extras
+        elif hasattr(baseitem, 'sub'):
+            context['extras'] = SubExtra.objects.filter(size=baseitem.size).all()
+
+        return render(request, 'orders/add_item.html', context)
+
+    # AmitTempCode Handle the post case...
+
+
+
+
+
 
 
 
