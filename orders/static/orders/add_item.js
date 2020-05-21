@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Just check if the page is loaded from a back button then reload it with original data
+    // otherwise what will happen is that our data will update later in the page and hence 
+    // script wont update the cost.
+    if(performance.navigation.type == 2){
+        location.reload(true);
+     }
+
     // Get initial price of item as this is what we set by default in the page.
     const individual_item_price = parseFloat(document.getElementById('individual-item-price').innerHTML);
     var cur_quantity = 1;
@@ -10,7 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
             cur_quantity = 1 ;
         if (individual_extra_cost < 0 )
         individual_extra_cost = 0 ;
-        document.querySelector('#total-price').innerHTML = ( ( individual_item_price + individual_extra_cost ) * cur_quantity ).toFixed(2) ;
+        let totalcost = ( ( individual_item_price + individual_extra_cost ) * cur_quantity ).toFixed(2) ;
+        document.getElementsByName('total-price')[0].value = totalcost ;
     } ;
 
     // When quantity changed,
@@ -38,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // If extra exists,
     {
-        let extraNodes = document.getElementsByName('extra') ;
+        let extraNodes = document.getElementsByClassName('extrasub') ;
         for ( let i = 0 ; i < extraNodes.length ; i++)
         {
             extraNodes[i].addEventListener ( 'change' , fnUpdateForExtraCost , false ) ;

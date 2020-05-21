@@ -21,33 +21,37 @@ class BaseItem(models.Model):
         (LARGE, 'Large')
     )
     size = models.CharField(max_length=8, choices=SIZE_CHOICES, blank=True)
-    price = models.DecimalField(max_digits=6, decimal_places=2,blank=True, default=0) # Blankable for Toppings
+     # Blankable for Toppings
+    price = models.DecimalField(max_digits=6, decimal_places=2, blank=True, default=0)
 
     def __str__(self):
         retstr = f"{self.name}"
-        if ( self.is_size_required() ):
+        if self.is_size_required():
             retstr += f" ({self.size})"
 
-        if ( self.is_price_required() ):
+        if self.is_price_required():
             retstr += f" @{self.price})"
         return retstr
 
 
 
     def is_price_required(self):
+        ''' check if price is required '''
         return False
 
     def is_size_required(self):
+        ''' check if size is required '''
         return False
 
 
     def is_valid_item(self):
-        if ( self.is_price_required() ):
-            if ( self.price <= 0 ):
+        ''' check if is valid item for saving '''
+        if self.is_price_required():
+            if self.price <= 0:
                 return "Price is not valid"
 
-        if ( self.is_size_required() ):
-            if ( "" == self.size ):
+        if self.is_size_required():
+            if self.size == "":
                 return "Portion size is not specified"
 
         return ""
@@ -55,7 +59,7 @@ class BaseItem(models.Model):
     def save(self, *args, **kwargs):
         # Check if we can save with the current settings or not.
         errmsg = self.is_valid_item()
-        if ( len(errmsg) > 0 ):
+        if len(errmsg) > 0:
             raise ValueError(errmsg)
         super().save(*args, **kwargs)
 
@@ -77,6 +81,7 @@ class Pizza(BaseItem):
 
     def __str__(self):
         return f"{self.crust} Pizza with {self.name} ({self.size}) @ {self.price}"
+
 
     def is_price_required(self):
         return True
@@ -140,8 +145,6 @@ class SubExtra(BaseItem):
 class Topping(BaseItem):
     """Define toppings."""
 
-    pass
-
 
 
 
@@ -175,8 +178,39 @@ class Salad(BaseItem):
 
 
 
+#-----------------------------------------------------------------------
+#
+class IndividualCartItem(models.Model):
+    """Individual Cart items"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cart')
+    baseitem = models.ForeignKey(BaseItem, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+    # For pizza
+    toppings = models.ManyToManyField(Topping, blank=True, related_name='carts_toppings')
+    # For Sub
+    subextra = models.ManyToManyField(SubExtra, blank=True, related_name='carts_extras')
+    price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+
+    def __str__(self):
+        return f"{self.user} {self.baseitem} {self.quantity} "
 
 
 
 
+
+#-----------------------------------------------------------------------
+#
+class IndividualOrderItem(models.Model):
+    """Individual Order items"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order')
+    baseitem = models.ForeignKey(BaseItem, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+    # For pizza
+    toppings = models.ManyToManyField(Topping, blank=True, related_name='orders_toppings')
+    # For Sub
+    subextra = models.ManyToManyField(SubExtra, blank=True, related_name='orders_extras')
+    price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+
+    def __str__(self):
+        return f"{self.user} {self.baseitem} {self.quantity} "
 

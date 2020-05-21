@@ -13,8 +13,11 @@
 <form action="{% url 'orders:add_item' item.id %}" method="POST">
     {% csrf_token %}
     <nav class="navbar sticky-top navbar-dark bg-dark justify-content-between">
-        <a class="btn btn-sm btn-outline-secondary my-2 my-sm-0" href="{% url 'orders:menu' %}">Back to menu</a>
-        <input type="submit" value="Add to Cart" class="btn btn-sm btn-outline-success my-2 my-sm-0">
+        <a class="btn btn-sm btn-secondary my-2 my-sm-0" href="{% url 'orders:menu' %}">Back to menu</a>
+        <div>
+        <input type="submit" name="add-to-cart" value="Add to Cart" class="btn btn-sm btn-success my-2 my-sm-0">
+        <input type="submit" name="add-to-cart-checkout" value="Add to Cart & Checkout" class="btn btn-sm btn-success my-2 my-sm-0">
+    </div>
     </nav>
 
     <h1>{{ item.name }}{% if item.size != '' %} - ({{item.size}}){% endif %}</h1>
@@ -54,7 +57,7 @@
             {% for extra in extras %}
             <tr>
                 <td>Extra {{ extra.name }} (+<span id="extra_price-{{extra.id}}">{{ extra.price }}</span>)</td>
-                <td><input name="extra" value="{{ extra.id }}" id="extra-{{extra.id}}" type="checkbox"></td>
+                <td><input class="extrasub" name="extra-{{forloop.counter}}" value="{{ extra.id }}" id="extra-{{extra.id}}" type="checkbox"></td>
             </tr>
             {% endfor %}
             {% endif%}
@@ -62,12 +65,18 @@
             <!-- Now lets show the total price -->
             <tr style="font-weight:bold">
                 <td>Total Price</td>
-                <td><div id="total-price">{{ item.price }}</div></td>
+                <td><input name="total-price" readonly style="border: none; font-weight: bold;" value={{ item.price }}></td>
             </tr>
     
         </tbody>
     </table>
 
+    <!-- Extra Hidden data in the form to show additional info -->
+    {% if extras %}
+    <input type="hidden" readonly name="extra-sub-count" value={{extras|length}} />
+    {% else %}
+    <input type="hidden" readonly name="extra-sub-count" value=0 />
+    {% endif%}
 
 </form>
 {% endblock %}

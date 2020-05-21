@@ -54,13 +54,13 @@
             <tr>
                 <td><b>{{ pizza.name }}</b></td>
                 {% if pizza.id_small %}
-                <td >{{ pizza.price_small }} <a href="{% url 'orders:add_item' pizza.id_small %}" >Add to Cart</a></td>
+                <td >{{ pizza.price_small }} <a href="{% url 'orders:add_item' pizza.id_small %}" >Customize & Add</a></td>
                 {% else %}
                 <td></td>
                 {% endif %}
 
                 {% if pizza.id_large %}
-                <td>{{ pizza.price_large }} <a href="{% url 'orders:add_item' pizza.id_large %}">Add to Cart</a></td>
+                <td>{{ pizza.price_large }} <a href="{% url 'orders:add_item' pizza.id_large %}">Customize & Add</a></td>
                 {% else %}
                 <td></td>
                 {% endif %}
@@ -89,13 +89,13 @@
             <tr>
                 <td><b>{{ pizza.name }}</b></td>
                 {% if pizza.id_small %}
-                <td>{{ pizza.price_small }} <a href="{% url 'orders:add_item' pizza.id_small %}">Add to Cart</a></td>
+                <td>{{ pizza.price_small }} <a href="{% url 'orders:add_item' pizza.id_small %}">Customize & Add</a></td>
                 {% else %}
                 <td></td>
                 {% endif %}
 
                 {% if pizza.id_large %}
-                <td>{{ pizza.price_large }} <a href="{% url 'orders:add_item' pizza.id_large %}">Add to Cart</a></td>
+                <td>{{ pizza.price_large }} <a href="{% url 'orders:add_item' pizza.id_large %}">Customize & Add</a></td>
                 {% else %}
                 <td></td>
                 {% endif %}
@@ -142,13 +142,13 @@
             <tr>
                 <td><b>{{ sub.name }}</b></td>
                 {% if sub.id_small %}
-                <td>{{ sub.price_small }} <a href="{% url 'orders:add_item' sub.id_small %}">Add to Cart</a></td>
+                <td>{{ sub.price_small }} <a href="{% url 'orders:add_item' sub.id_small %}">Customize & Add</a></td>
                 {% else %}
                 <td></td>
                 {% endif %}
 
                 {% if sub.id_large %}
-                <td>{{ sub.price_large }} <a href="{% url 'orders:add_item' sub.id_large %}">Add to Cart</a></td>
+                <td>{{ sub.price_large }} <a href="{% url 'orders:add_item' sub.id_large %}">Customize & Add</a></td>
                 {% else %}
                 <td></td>
                 {% endif %}
@@ -191,7 +191,7 @@
             {% for pasta in pastas %}
             <tr>
                 <td><b>{{ pasta.name }}</b></td>
-                <td>{{ pasta.price }} <a href="{% url 'orders:add_item' pasta.id %}">Add to Cart</a></td>
+                <td>{{ pasta.price }} <a href="{% url 'orders:add_item' pasta.id %}">Customize & Add</a></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -212,7 +212,7 @@
             {% for salad in salads %}
             <tr>
                 <td><b>{{ salad.name }}</b></td>
-                <td>{{ salad.price }} <a href="{% url 'orders:add_item' salad.id %}">Add to Cart</a></td>
+                <td>{{ salad.price }} <a href="{% url 'orders:add_item' salad.id %}">Customize & Add</a></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -238,13 +238,13 @@
             <tr>
                 <td><b>{{ dinner.name }}</b></td>
                 {% if dinner.id_small %}
-                <td>{{ dinner.price_small }} <a href="{% url 'orders:add_item' dinner.id_small %}">Add to Cart</a></td>
+                <td>{{ dinner.price_small }} <a href="{% url 'orders:add_item' dinner.id_small %}">Customize & Add</a></td>
                 {% else %}
                 <td></td>
                 {% endif %}
 
                 {% if dinner.id_large %}
-                <td>{{ dinner.price_large }} <a href="{% url 'orders:add_item' dinner.id_large %}">Add to Cart</a></td>
+                <td>{{ dinner.price_large }} <a href="{% url 'orders:add_item' dinner.id_large %}">Customize & Add</a></td>
                 {% else %}
                 <td></td>
                 {% endif %}

@@ -32,7 +32,6 @@
         <a href="{% url 'orders:order_history' %}">Previous Orders</a>
         <a href="{% url 'orders:cart' %}">Cart
             {% if item_in_cart_count %}
-            <!-- AmitTempCode add the data for item_in_cart_count -->
             <span class="badge badge-pill badge-light" style="font-size: 60%; position: absolute;">{{item_in_cart_count}}</span>
             {% endif %}
         </a>
