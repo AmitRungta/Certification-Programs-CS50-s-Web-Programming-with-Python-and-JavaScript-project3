@@ -202,7 +202,7 @@ class IndividualCartItem(models.Model):
 #
 class IndividualOrderItem(models.Model):
     """Individual Order items"""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order_item')
     baseitem = models.ForeignKey(BaseItem, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     # For pizza
@@ -214,3 +214,36 @@ class IndividualOrderItem(models.Model):
     def __str__(self):
         return f"{self.user} {self.baseitem} {self.quantity} "
 
+
+
+
+#-----------------------------------------------------------------------
+#
+class OrderDetail(models.Model):
+    """ Collection of all the order items from the cart."""
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order')
+    # as every order item is just associated with one order hence they are in onetomany relationship
+    # with order but as OneToManyField is not avialable in Django ORM hence either i can use Foreign
+    # Key in IndividualOrderItem or can use ManyToMany. As using ManyToMany wont effect us anyhow
+    # hence we will use this and not Foreign Key.
+    orderitems = models.ManyToManyField(IndividualOrderItem, related_name='order')
+    orderprice = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    ordertime = models.DateTimeField(default=timezone.now)
+    contact = models.CharField(max_length=50)
+    address = models.CharField(max_length=100)
+    message = models.CharField(max_length=100, blank=True)
+    ORDERED = 'Ordered'
+    PREPARING = 'Preparing'
+    SHIPPED = 'On Way'
+    DELIVERED = 'Delivered'
+    STATUS_CHOCIES = (
+        (ORDERED, 'Ordered'),
+        (PREPARING, 'Preparing'),
+        (SHIPPED, 'On Way'),
+        (DELIVERED, 'Delivered')
+    )
+    status = models.CharField(max_length=16, choices=STATUS_CHOCIES, default=ORDERED)
+
+    def __str__(self):
+        return f"{self.user} {self.contact} {self.ordertime} @ {self.status}"

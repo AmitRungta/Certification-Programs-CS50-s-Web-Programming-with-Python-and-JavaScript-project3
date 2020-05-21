@@ -79,7 +79,7 @@
     <div style="width: 90%;">
             <form class="site-form" id="Customer-details-form" action="{% url 'orders:place_order' %}" method="POST">
             {% csrf_token %}
-            <h3>Custome detials</h3>
+            <h3>Custome details</h3>
             <div class="form-group">
                 Contact* <small class="form-text text-muted" style="float: right ;">(Maximum length of 50 character)</small>
                 <input class="form-control" name="contact" placeholder="Phone Number" required maxlength="50">

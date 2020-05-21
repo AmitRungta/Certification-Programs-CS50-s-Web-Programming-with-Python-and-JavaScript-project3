@@ -1,0 +1,43 @@
+{% extends 'base_layout.html' %}
+
+
+{% block title %}{{ block.super }} - previous orders{% endblock %}
+
+
+{% block content%}
+<nav class="navbar sticky-top navbar-dark bg-dark justify-content-between">
+    <a class="btn btn-sm btn-secondary my-2 my-sm-0" href="{% url 'orders:menu' %}">Start shopping</a>
+</nav>
+
+
+{% if orders_list and orders_list|length > 0 %}
+
+<!-- lets create a table with hidden borders so as to show the options. -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col" style="width: 25%">Order time</th>
+            <th scope="col" style="width: 25%">Cost</th>
+            <th scope="col" style="width: 25%">Message</th>
+            <th scope="col" style="width: 25%">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for order in orders_list %}
+        <tr>
+            <td><a href="{% url 'orders:order_detail' order.id %}">{{ order.ordertime }}</a></td>
+            <td>{{ order.orderprice }}</td>
+            <td>{{ order.message }}</td>
+            <td>{{ order.status }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% else%}
+<h3>No previous orders found...</h3>
+{% endif %}
+
+{% endblock %}

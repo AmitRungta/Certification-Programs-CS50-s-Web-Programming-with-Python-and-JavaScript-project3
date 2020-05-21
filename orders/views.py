@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 
-from .models import Pizza, Sub, Dinner, SubExtra, Topping, Salad, Pasta, BaseItem, IndividualCartItem, IndividualOrderItem
+from .models import Pizza, Sub, Dinner, SubExtra, Topping, Salad, Pasta, BaseItem, IndividualCartItem, IndividualOrderItem, OrderDetail
 
 
 #---------------------------------------------------------------------------
@@ -46,7 +46,7 @@ def get_total_items_in_cart_count(request):
         return 0
     cartitemscount = IndividualCartItem.objects.filter(user=request.user).count()
     return cartitemscount
-    
+
 
 
 # Create your views here.
@@ -193,13 +193,94 @@ def place_order(request):
     if request.method == 'GET':
         return HttpResponseNotFound()
 
-    # AmitTempCode
+    # first of all get the complete cart items.
+    cartitems = IndividualCartItem.objects.filter(user=request.user).all()
+
+    # lets get the cart total.
+    cart_total_cost = 0
+    for item in cartitems:
+        cart_total_cost += item.price
+  
+    # get the details from the form.
+    contact = request.POST['contact']
+    address = request.POST['address']
+    message = request.POST['message']
+
+    # now lets create the order..
+    orderdetail = OrderDetail.objects.create(
+        user=request.user,
+        orderprice=cart_total_cost,
+        contact=contact,
+        address=address,
+        message=message,
+    )
+
+    # now lets add each item of this cart in the order
+    for item in cartitems:
+        orderitem = IndividualOrderItem.objects.create(
+            user=request.user,
+            baseitem=item.baseitem,
+            quantity=item.quantity,
+            price=item.price
+            )
+
+        # now lets add each topping from the cart to this order
+        for topping in item.toppings.all():
+            orderitem.toppings.add(topping)
+
+        # now lets add each extra from the cart to this order
+        for extra in item.subextra.all():
+            orderitem.subextra.add(extra)
+
+        # we have completed the order item hence lets add this in our order
+        orderdetail.orderitems.add(orderitem)
+
+    # as we have completed our order hence lets delete this cart item.
+    cartitems.delete()
+    orderdetail.save()
+
+    return HttpResponseRedirect(reverse('orders:order_history'))
 
 
-    return HttpResponseRedirect(reverse('orders:menu'))
 
 
 
+@login_required(login_url='accounts:login')
+def order_history(request):
+    ''' Function to get the order history for this customer ... '''
+
+    if request.method == 'POST':
+        return HttpResponseNotFound()
+
+    context = {
+        "orders_list": OrderDetail.objects.filter(user=request.user).order_by('-ordertime')
+    }
+
+    # now set the item count in hte cart.
+    context['item_in_cart_count'] = get_total_items_in_cart_count(request)
+    return render(request, 'orders/order_history.html', context)
+
+
+
+
+
+
+@login_required(login_url='accounts:login')
+def order_detail(request, order_id):
+    ''' Function to get the details of this order. Here we will validate that the order should belong to this customer... '''
+
+    try:
+        orderdetail = OrderDetail.objects.get(pk=order_id, user=request.user)
+    except OrderDetail.DoesNotExist:
+        return HttpResponseNotFound()
+
+    context = {
+        "orderdetail": orderdetail
+    }
+
+    # now set the item count in hte cart.
+    context['item_in_cart_count'] = get_total_items_in_cart_count(request)
+    return render(request, 'orders/order_detail.html', context)
 
 
 
@@ -223,4 +304,3 @@ def manage_admin_order(request):
     # now set the item count in hte cart.
     context['item_in_cart_count'] = get_total_items_in_cart_count(request)
     return render(request, 'orders/menu.html', context)
-

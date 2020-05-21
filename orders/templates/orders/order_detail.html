@@ -1,0 +1,79 @@
+{% extends 'base_layout.html' %}
+
+
+{% block title %}{{ block.super }} - order details{% endblock %}
+
+
+{% block content%}
+<nav class="navbar sticky-top navbar-dark bg-dark justify-content-between">
+    <a class="btn btn-sm btn-secondary my-2 my-sm-0" href="{% url 'orders:menu' %}">Continue shopping</a>
+    <a class="btn btn-sm btn-secondary my-2 my-sm-0" href="{% url 'orders:order_history' %}">Previous Orders</a>
+</nav>
+
+<!-- lets create a table with hidden borders so as to show the options. -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col" style="width: 40%">Item (Size)</th>
+            <th scope="col" style="width: 10%">Quantity</th>
+            <th scope="col" style="width: 10%">Cost</th>
+            <th scope="col" style="width: 40%">Addons</th>
+        </tr>
+    </thead>
+    <tbody>
+
+    {% for orderitem in orderdetail.orderitems.all %}
+    <tr>
+        <td>{% if orderitem.baseitem.pizza.crust %}{{ orderitem.baseitem.pizza.crust}} Pizza - {% endif %}
+            {{ orderitem.baseitem.name }} {% if orderitem.baseitem.size %} ({{ orderitem.baseitem.size}} ){% endif %}
+        </td>
+        <td>{{ orderitem.quantity }}</td>
+        <td>{{ orderitem.price }}</td>
+        <td>{% if orderitem.toppings.count > 0 %}
+            {% for topping in orderitem.toppings.all %}
+            {% if forloop.last %}
+            {{ topping.name }}
+            {% else %}
+            {{ topping.name }},
+            {% endif %}
+            {% endfor %}
+            {% elif orderitem.subextra.count > 0 %}
+            {% for extra in orderitem.subextra.all %}
+            {% if forloop.last %}
+            {{ extra.name }}
+            {% else %}
+            {{ extra.name }},
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+
+
+    <!-- now lets write the cart total. -->
+    <tr style="font-weight:bold">
+        <td>Total</td>
+        <td></td>
+        <td>{{orderdetail.orderprice}}</td>
+        <td></td>
+        <td></td>
+    </tr>
+       
+    </tbody>
+</table>
+
+<br>
+<div class="row justify-content-center">
+    <div style="width: 90%;" class="site-form">
+        <h3>Customer details</h3>
+        Contact
+        <input class="form-control" name="contact" placeholder="Phone Number" readonly value="{{orderdetail.contact}}">
+        Address
+        <input class="form-control" name="address" placeholder="Address" readonly value="{{orderdetail.address}}">
+        Special request
+        <input class="form-control" name="message" placeholder="Message" readonly value="{{orderdetail.message}}">
+    </div>
+</div>
+
+{% endblock %}
