@@ -41,6 +41,7 @@
                 {% csrf_token %}
                 <button class="button right NavigationBarbutton" type="submit">Logout</button>
             </form>
+        <a href="" class="right">Welcome, <strong>{{user}}.</strong></a>
         {% else %}
         <a href="{% url 'accounts:login' %}" class="right">Login</a>
         <a href="{% url 'accounts:signup' %}" class="right">Signup</a>

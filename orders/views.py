@@ -187,6 +187,39 @@ def delete_cart_item(request, cartitem_id):
 
 
 @login_required(login_url='accounts:login')
+def confirm_order(request):
+    ''' Function to place a new order from our current cart ... '''
+
+    if request.method == 'GET':
+        return HttpResponseNotFound()
+
+    # first of all get the complete cart items.
+    cartitems = IndividualCartItem.objects.filter(user=request.user).all()
+    context = {
+        "cartitems": cartitems
+    }
+
+    # lets get the cart total.
+    cart_total_cost = 0
+    for item in cartitems:
+        cart_total_cost += item.price
+    context['cart_total_cost'] = cart_total_cost
+
+    # get the details from the form.
+    context['contact'] = request.POST['contact']
+    context['address'] = request.POST['address']
+    context['message'] = request.POST['message']
+    context['for_confimation_readonly'] = 'True'
+
+    # do not set the cart item count here as in this case i donot want to show any item in cart.
+    # context['item_in_cart_count'] = get_total_items_in_cart_count(request)
+    return render(request, 'orders/cartitemlist.html', context)
+
+
+
+
+
+@login_required(login_url='accounts:login')
 def place_order(request):
     ''' Function to place a new order from our current cart ... '''
 
@@ -200,7 +233,7 @@ def place_order(request):
     cart_total_cost = 0
     for item in cartitems:
         cart_total_cost += item.price
-  
+
     # get the details from the form.
     contact = request.POST['contact']
     address = request.POST['address']
@@ -263,14 +296,15 @@ def order_history(request):
 
 
 
-
-
 @login_required(login_url='accounts:login')
 def order_detail(request, order_id):
     ''' Function to get the details of this order. Here we will validate that the order should belong to this customer... '''
 
     try:
-        orderdetail = OrderDetail.objects.get(pk=order_id, user=request.user)
+        if request.user.is_superuser:
+            orderdetail = OrderDetail.objects.get(pk=order_id)
+        else:
+            orderdetail = OrderDetail.objects.get(pk=order_id, user=request.user)
     except OrderDetail.DoesNotExist:
         return HttpResponseNotFound()
 
@@ -285,11 +319,6 @@ def order_detail(request, order_id):
 
 
 
-
-
-
-
-
 @login_required(login_url='accounts:login')
 def manage_admin_order(request):
     ''' Function to manage orders by super user... '''
@@ -297,10 +326,35 @@ def manage_admin_order(request):
     if not request.user.is_superuser:
         return HttpResponseForbidden()
 
-    # AmitTempCode
-    context = {}
+    # if this is a post message then its for updating the status of any order.
+    if request.method == 'POST':
+        try:
+            orderid = request.POST['orderid']
+            status = request.POST['status']
+            orderdetail = OrderDetail.objects.get(pk=orderid)
+            #update the status
+            if status == "Cancel":
+                # we want to cancel this order hence elete it.
+                # now lets delete each individual item row for this order
+                for item in orderdetail.orderitems.all():
+                    item.delete()
+
+                # now lets delete this order completely
+                orderdetail.delete()
+            elif orderdetail.status != status:
+                orderdetail.status = status
+                orderdetail.save()
+
+            return HttpResponseRedirect(reverse('orders:manage_admin_order'))
+        except:
+            return HttpResponseNotFound()
 
 
-    # now set the item count in hte cart.
-    context['item_in_cart_count'] = get_total_items_in_cart_count(request)
-    return render(request, 'orders/menu.html', context)
+    context = {
+        "ordered_orders": OrderDetail.objects.filter(status=OrderDetail.ORDERED).order_by('-ordertime'),
+        "preparing_orders": OrderDetail.objects.filter(status=OrderDetail.PREPARING).order_by('-ordertime'),
+        "shipped_orders": OrderDetail.objects.filter(status=OrderDetail.SHIPPED).order_by('-ordertime'),
+        "delivered_orders": OrderDetail.objects.filter(status=OrderDetail.DELIVERED).order_by('-ordertime')
+    }
+
+    return render(request, 'orders/manage_admin_order.html', context)

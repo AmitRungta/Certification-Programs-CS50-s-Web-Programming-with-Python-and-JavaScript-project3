@@ -29,7 +29,7 @@ a, a:hover, a:visited{
 .site-form input, .site-form textarea{
     display: block;
     margin: 0;
-    padding: 10px;
+    padding: .25em;
 }
 
 a.highlight{
@@ -73,5 +73,6 @@ a.highlight{
     background-color: lightgray; 
     margin: 0; 
     padding: .3em; 
-    text-align: center;    
+    text-align: center;
+    font-size: 1.25rem;
 }

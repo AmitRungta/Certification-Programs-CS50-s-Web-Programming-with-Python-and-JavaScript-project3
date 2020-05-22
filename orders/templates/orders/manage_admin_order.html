@@ -1,0 +1,213 @@
+{% extends 'base_layout.html' %}
+
+
+{% block title %}{{ block.super }} - manage orders{% endblock %}
+
+{% block head %}
+{% load static %}
+<script src="{% static 'orders/manage_admin_order.js' %}"></script>
+{% endblock %}
+
+
+{% block content%}
+<nav class="navbar sticky-top navbar-dark bg-dark">
+    <a class="navbar-brand" href="#new_orders">New Orders</a>
+    <a class="navbar-brand" href="#processing_orders">Currently Processing Orders</a>
+    <a class="navbar-brand" href="#shipped_orders">On Way</a>
+    <a class="navbar-brand" href="#delivered_orders">Delivered</a>
+</nav>
+
+
+<!-- do for new received orders -->
+<br>
+<h2 id="new_orders" class="menu-subheading">New Orders</h2>
+{% if ordered_orders and ordered_orders|length > 0 %}
+
+<!-- lets create a table with hidden borders so as to show the options. -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col" style="width: 10%">Order ID</th>
+            <th scope="col" style="width: 25%">Order time</th>
+            <th scope="col" style="width: 15%">User</th>
+            <th scope="col" style="width: 10%">Cost</th>
+            <th scope="col" style="width: 20%">Message</th>
+            <th scope="col" style="width: 20%">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for order in ordered_orders %}
+        <tr>
+            <td><a href="{% url 'orders:order_detail' order.id %}">{{ order.id }}</a></td>
+            <td><a href="{% url 'orders:order_detail' order.id %}">{{ order.ordertime }}</a></td>
+            <td>{{ order.user }}</a></td>
+            <td>{{ order.orderprice }}</td>
+            <td>{{ order.message }}</td>
+            <td><form name="update_status-{{ order.id }}" action="{% url 'orders:manage_admin_order' %}" onsubmit='return validateStatusUpdateForm("{{ order.id }}")' , method="POST">
+                    {% csrf_token %}
+                    <input hidden name="orderid" value="{{ order.id }}">
+                    <input hidden name="original-status" value="Ordered">
+                    <div class="input-group">
+                        <select class="custom-select" name="status">
+                            <option value="Cancel">Cancel</option>
+                            <option selected value="Ordered">Ordered</option>
+                            <option value="Preparing">Preparing</option>
+                        </select>
+                        <div class="input-group-append">
+                            <input class="btn btn-sm btn-secondary" type="submit" value="Update">
+                        </div>
+                    </div>
+                </form>
+            </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else%}
+<h5>No new order received...</h5>
+{% endif %}
+
+<br>
+
+
+
+<!-- do for orders being prepared -->
+<h2 id="processing_orders" class="menu-subheading">Currently Processing Orders</h2>
+{% if preparing_orders and preparing_orders|length > 0 %}
+
+<!-- lets create a table with hidden borders so as to show the options. -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col" style="width: 10%">Order ID</th>
+            <th scope="col" style="width: 25%">Order time</th>
+            <th scope="col" style="width: 15%">User</th>
+            <th scope="col" style="width: 10%">Cost</th>
+            <th scope="col" style="width: 20%">Message</th>
+            <th scope="col" style="width: 20%">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for order in preparing_orders %}
+        <tr>
+            <td><a href="{% url 'orders:order_detail' order.id %}">{{ order.id }}</a></td>
+            <td><a href="{% url 'orders:order_detail' order.id %}">{{ order.ordertime }}</a></td>
+            <td>{{ order.user }}</a></td>
+            <td>{{ order.orderprice }}</td>
+            <td>{{ order.message }}</td>
+            <td><form name="update_status-{{ order.id }}" action="{% url 'orders:manage_admin_order' %}" onsubmit='return validateStatusUpdateForm("{{ order.id }}")' , method="POST">
+                {% csrf_token %}
+                <input hidden name="orderid" value="{{ order.id }}">
+                <input hidden name="original-status" value="Preparing">
+                <div class="input-group">
+                    <select class="custom-select" name="status">
+                        <option value="Cancel">Cancel</option>
+                        <option selected value="Preparing">Preparing</option>
+                        <option value="On Way">On Way</option>
+                    </select>
+                    <div class="input-group-append">
+                        <input class="btn btn-sm btn-secondary" type="submit" value="Update">
+                    </div>
+                </div>
+            </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else%}
+<h5>No order are currently being processed...</h5>
+{% endif %}
+
+<br>
+
+
+<!-- do for orders being shipped -->
+<h2 id="shipped_orders" class="menu-subheading">Orders On Way to customer</h2>
+{% if shipped_orders and shipped_orders|length > 0 %}
+
+<!-- lets create a table with hidden borders so as to show the options. -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col" style="width: 10%">Order ID</th>
+            <th scope="col" style="width: 25%">Order time</th>
+            <th scope="col" style="width: 15%">User</th>
+            <th scope="col" style="width: 10%">Cost</th>
+            <th scope="col" style="width: 20%">Message</th>
+            <th scope="col" style="width: 20%">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for order in shipped_orders %}
+        <tr>
+            <td><a href="{% url 'orders:order_detail' order.id %}">{{ order.id }}</a></td>
+            <td><a href="{% url 'orders:order_detail' order.id %}">{{ order.ordertime }}</a></td>
+            <td>{{ order.user }}</a></td>
+            <td>{{ order.orderprice }}</td>
+            <td>{{ order.message }}</td>
+            <td><form name="update_status-{{ order.id }}" action="{% url 'orders:manage_admin_order' %}" onsubmit='return validateStatusUpdateForm("{{ order.id }}")' , method="POST">
+                {% csrf_token %}
+                <input hidden name="orderid" value="{{ order.id }}">
+                <input hidden name="original-status" value="On Way">
+                <div class="input-group">
+                    <select class="custom-select" name="status">
+                        <option value="Cancel">Cancel</option>
+                        <option selected value="On Way">On Way</option>
+                        <option value="Delivered">Delivered</option>
+                    </select>
+                    <div class="input-group-append">
+                        <input class="btn btn-sm btn-secondary" type="submit" value="Update">
+                    </div>
+                </div>
+            </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else%}
+<h5>No order are currently on the way to customer...</h5>
+{% endif %}
+
+<br>
+
+
+<!-- do for fulfilled orders -->
+<h2 id="delivered_orders" class="menu-subheading">Delivered Orders</h2>
+{% if delivered_orders and delivered_orders|length > 0 %}
+
+<!-- lets create a table with hidden borders so as to show the options. -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col" style="width: 10%">Order ID</th>
+            <th scope="col" style="width: 25%">Order time</th>
+            <th scope="col" style="width: 15%">User</th>
+            <th scope="col" style="width: 10%">Cost</th>
+            <th scope="col" style="width: 20%">Message</th>
+            <th scope="col" style="width: 20%">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for order in delivered_orders %}
+        <tr>
+            <td><a href="{% url 'orders:order_detail' order.id %}">{{ order.id }}</a></td>
+            <td><a href="{% url 'orders:order_detail' order.id %}">{{ order.ordertime }}</a></td>
+            <td>{{ order.user }}</a></td>
+            <td>{{ order.orderprice }}</td>
+            <td>{{ order.message }}</td>
+            <td>{{ order.status }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+
+
+{% endblock %}

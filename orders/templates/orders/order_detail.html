@@ -7,7 +7,12 @@
 {% block content%}
 <nav class="navbar sticky-top navbar-dark bg-dark justify-content-between">
     <a class="btn btn-sm btn-secondary my-2 my-sm-0" href="{% url 'orders:menu' %}">Continue shopping</a>
+    <div>
+    {% if user.is_superuser %}
+    <a class="btn btn-sm btn-secondary my-2 my-sm-0" href="{% url 'orders:manage_admin_order' %}">Manage Order</a>
+    {% endif %}
     <a class="btn btn-sm btn-secondary my-2 my-sm-0" href="{% url 'orders:order_history' %}">Previous Orders</a>
+    </div>
 </nav>
 
 <!-- lets create a table with hidden borders so as to show the options. -->

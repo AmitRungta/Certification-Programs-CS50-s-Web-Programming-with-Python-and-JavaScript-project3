@@ -1,7 +1,8 @@
 {% extends 'base_layout.html' %}
 
 
-{% block title %}{{ block.super }} - cart{% endblock %}
+{% block title %}{{ block.super }} - {% if for_confimation_readonly %}confirm order{% else %}cart{% endif %}{% endblock %}
+
 
 {% block head %}
 {% load static %}
@@ -10,10 +11,17 @@
 
 {% block content%}
 {% if cartitems and cartitems|length > 0 %}
+    {% if for_confimation_readonly %}
+    <nav class="navbar sticky-top navbar-dark bg-dark justify-content-between">
+        <a class="btn btn-sm btn-secondary my-2 my-sm-0" href="{% url 'orders:cart' %}">Modify order</a>
+        <input type="button" value="Confirm & place order" class="btn btn-sm btn-success my-2 my-sm-0" onclick="fnCheckOut()">
+    </nav>
+    {% else %}
     <nav class="navbar sticky-top navbar-dark bg-dark justify-content-between">
         <a class="btn btn-sm btn-secondary my-2 my-sm-0" href="{% url 'orders:menu' %}">Continue shopping</a>
         <input type="button" value="Checkout" class="btn btn-sm btn-success my-2 my-sm-0" onclick="fnCheckOut()">
     </nav>
+    {% endif %}
 
 <!-- lets create a table with hidden borders so as to show the options. -->
 <table class="table table-striped">
@@ -23,7 +31,9 @@
             <th scope="col" style="width: 10%">Quantity</th>
             <th scope="col" style="width: 10%">Cost</th>
             <th scope="col" style="width: 30%">Addons</th>
+            {% if not for_confimation_readonly %}
             <th scope="col" style="width: 10%"></th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -53,12 +63,14 @@
                 {% endfor %}
                 {% endif %}
             </td>
+            {% if not for_confimation_readonly %}
             <td>
                 <form action="{% url 'orders:delete_cart_item' cartitem.id %}" method="POST" onsubmit="return confirm('Are you sure you want to delete this entry ?');">
                     {% csrf_token %}
                     <input type="submit" value="Delete" class="btn btn-sm btn-outline-danger my-2 my-sm-0">
                 </form>
             </td>
+            {% endif %}
         </tr>
         {% endfor %}
 
@@ -68,7 +80,9 @@
             <td></td>
             <td><span id="cart-total-cost">{{cart_total_cost}}</span></td>
             <td></td>
+            {% if not for_confimation_readonly %}
             <td></td>
+            {% endif %}
         </tr>
        
     </tbody>
@@ -77,21 +91,36 @@
 <br>
 <div class="row justify-content-center">
     <div style="width: 90%;">
-            <form class="site-form" id="Customer-details-form" action="{% url 'orders:place_order' %}" method="POST">
+            <form class="site-form" id="Customer-details-form" 
+            {% if for_confimation_readonly %}
+            action="{% url 'orders:place_order' %}" 
+            {% else %}
+            action="{% url 'orders:confirm_order' %}" 
+            {% endif %}
+            method="POST">
+
             {% csrf_token %}
             <h3>Custome details</h3>
             <div class="form-group">
-                Contact* <small class="form-text text-muted" style="float: right ;">(Maximum length of 50 character)</small>
-                <input class="form-control" name="contact" placeholder="Phone Number" required maxlength="50">
+                Contact* 
+                {% if not for_confimation_readonly %}
+                <small class="form-text text-muted" style="float: right ;">(Maximum length of 50 character)</small>
+                {% endif %}
+                <input class="form-control" name="contact" {% if contact %}value="{{contact}}" {%endif%} placeholder="Phone Number" required {% if for_confimation_readonly %} readonly {% endif %} maxlength="50" >
             </div>
             <div class="form-group">
-                Address* <small class="form-text text-muted" style="float: right ;">(Maximum length of 100 character)</small>
-                <input class="form-control" name="address" placeholder="Address" required maxlength="100" >
+                Address* 
+                {% if not for_confimation_readonly %}
+                <small class="form-text text-muted" style="float: right ;">(Maximum length of 100 character)</small>
+                {% endif %}
+                <input class="form-control" name="address" {% if address %}value="{{address}}" {%endif%} placeholder="Address" required {% if for_confimation_readonly %} readonly {% endif %} maxlength="100" >
             </div>
             <div class="form-group">
-                Special request(optional)<small class="form-text text-muted" style="float: right ;">(Maximum length of 100 character)</small>
-                <input class="form-control" name="message" placeholder="Message"
-                    maxlength="100">
+                Special request(optional)
+                {% if not for_confimation_readonly %}
+                <small class="form-text text-muted" style="float: right ;">(Maximum length of 100 character)</small>
+                {% endif %}
+                <input class="form-control" name="message" placeholder="Message" {% if message %}value="{{message}}" {%endif%} {% if for_confimation_readonly %} readonly {% endif %} maxlength="100">
                 
             </div>
 
