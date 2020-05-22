@@ -229,7 +229,7 @@ class OrderDetail(models.Model):
     # hence we will use this and not Foreign Key.
     orderitems = models.ManyToManyField(IndividualOrderItem, related_name='order')
     orderprice = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-    ordertime = models.DateTimeField(default=timezone.now)
+    ordertime = models.DateTimeField(default=timezone.datetime.now())
     contact = models.CharField(max_length=50)
     address = models.CharField(max_length=100)
     message = models.CharField(max_length=100, blank=True)

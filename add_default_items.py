@@ -1,18 +1,29 @@
 ''' in this file we will add the desfualt items in our database. '''
 
 # Usage :
-# from add_default_items import add_default_pizza, add_default_toppings, add_default_dinner, add_default_sub, add_default_subextra, add_default_pasta, add_default_salad
-# add_default_pizza()
-# add_default_toppings()
-# add_default_dinner()
-# add_default_sub()
-# add_default_subextra()
-# add_default_pasta()
-# add_default_salad()
+# from add_default_items import add_default_menu
+# add_default_menu()
 
 
 
 from orders.models import Pizza, Sub, Dinner, SubExtra, Topping, Salad, Pasta, BaseItem
+
+
+def add_default_menu():
+    ''' initial function to add all the standard items in the database'''
+    add_default_pizza()
+    add_default_toppings()
+    add_default_dinner()
+    add_default_sub()
+    add_default_subextra()
+    add_default_pasta()
+    add_default_salad()
+
+
+
+
+
+
 
 
 def add_default_pizza():
