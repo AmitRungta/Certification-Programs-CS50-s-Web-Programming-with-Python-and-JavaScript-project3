@@ -10,8 +10,11 @@ In this project i have tried to create a order website for Pinnochio’s Pizza &
 
 While creating the database i have divided all the content into 4 major components.
 *  **BaseItem** : this is the base table from which each menu item table is derived. This table mainly consist of item name, Description , portion size , and individual price. Each menu component like Pizza / Sub / Dinner / Pasta / Salad / extra on the sub / pizza toppings. Some items which required additional options contain them in their individual classs like pizza contains base type ( regular / Sicilian ) and additiona ltopping.
+
 * **IndividualCartItem** : this table contains the items in the cart as per the individual user. Individual item consist of BaseItem, its quantity and desired toppings(for pizza)/ extra ( for sub). It also contains the cost for this item with addons and quantity.
+
 * **IndividualOrderItem** : this is similar to the cart item. It just differs that this is used for the final order when placed by the user.
+
 * **OrderDetail** : This is the final order data. It consist of IndividualOrderItem and the user details ( like contatc and address). This also contains the current status of the order ( Ordered / Preparing / On Way / Delivered). Once the order is received this can be seen by the administrator / any user in superuser group can update the status of the order. The order status moves from one state to the next one. User can also see his orders status in the order history option.
 
 
